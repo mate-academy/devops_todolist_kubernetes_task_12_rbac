@@ -1,45 +1,78 @@
-# Django ToDo list
+# Deployment Guide for Kubernetes Application with Custom RBAC
 
-This is a todo list web application with basic features of most web apps, i.e., accounts/login, API, and interactive UI. To do this task, you will need:
+This README provides detailed instructions on how to deploy a Kubernetes application using a custom RBAC configuration. The application deployment utilizes a ServiceAccount, Role, and RoleBinding to manage access to Kubernetes resources.
 
-- CSS | [Skeleton](http://getskeleton.com/)
-- JS  | [jQuery](https://jquery.com/)
+## Prerequisites
+- kind installed on your machine
+- kubectl installed and configured
 
-## Explore
+## Steps to Deploy
 
-Try it out by installing the requirements (the following commands work only with Python 3.8 and higher, due to Django 4):
-
-```
-pip install -r requirements.txt
-```
-
-Create a database schema:
-
-```
-python manage.py migrate
+1. Spin Up a Kubernetes Cluster with kind
+Use kind to create a Kubernetes cluster:
+```bash
+kind create cluster --config=cluster.yml
 ```
 
-And then start the server (default is http://localhost:8000):
-
+2. Apply the RBAC Configuration
+```bash
+kubectl apply -f security/rbac.yml
 ```
-python manage.py runserver
+
+This manifest includes a ServiceAccount, a Role that allows listing secrets, and a RoleBinding that binds the Role to the ServiceAccount.
+
+
+3. Deploy the Application
+```bash
+./bootstrap.sh
 ```
 
-Now you can browse the [API](http://localhost:8000/api/) or start on the [landing page](http://localhost:8000/).
+## Validate the Deployment
 
-## Task
+1. Access the Pod's Shell:`
+```bash
+kubectl exec -it <pod-name> -n todoapp -- sh
+```
 
-1. Fork this repository.
-1. Use `kind` to spin up a cluster from a `cluster.yml` configuration file.
-1. Create a manifest  named `rbac` inside a `security` directory
-1. `rbac` manifest requirements:
-    1. File should containa `ServiceAccount` definition
-    1. File should contain a `Role` definition
-    1. Role should allow to list secrets
-    1. File should contain a `RoleBinding` definition
-    1. RoleBinding should bind the `Role` to the `ServiceAccount`
-1. Use newly created `ServiceAccount` should be used by the `Deployment` in the `deployment` manifest
-1. Execute a curl command to list secrets from the `Deployment` pod to list secrets
-1. Make a screenshot of the output and attach it to the PR
-1. `README.md` should have instructuions on how to validate the changes
-1. Create PR with your changes and attach it for validation on a platform.
+2. Set Up the Necessary Variables:
+```bash
+Inside the shell, define the variables for the API server, token, and CA certificate:
+APISERVER=https://kubernetes.default.svc
+SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
+TOKEN=$(cat ${SERVICEACCOUNT}/token)
+CACERT=${SERVICEACCOUNT}/ca.crt
+```
+
+3. Execute the Curl Command to List Pods
+```bash
+curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/todoapp/pods
+```
+
+## Check the ServiceAccount
+
+To confirm the ServiceAccount is correctly created:
+```bash
+kubectl get serviceaccount -n <namespace> <serviceaccount-name>
+```
+
+## Verify the Role
+~~~~
+```bash
+kubectl get role -n <namespace> <role-name>
+```
+
+## Validate the RoleBinding
+
+```bash
+kubectl get rolebinding -n <namespace> <rolebinding-name>
+```
+
+## Check for Errors
+
+```bash
+kubectl describe serviceaccount -n <namespace> <serviceaccount-name>
+kubectl describe role -n <namespace> <role-name>
+kubectl describe rolebinding -n <namespace> <rolebinding-name>
+```
+
+Replace <pod-name>, <serviceaccount-name>, <namespace>, <role-name>, <rolebinding-name> with the appropriate values.
