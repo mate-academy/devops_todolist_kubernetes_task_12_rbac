@@ -1,45 +1,65 @@
-# Django ToDo list
 
-This is a todo list web application with basic features of most web apps, i.e., accounts/login, API, and interactive UI. To do this task, you will need:
+## How to Deploy the App
 
-- CSS | [Skeleton](http://getskeleton.com/)
-- JS  | [jQuery](https://jquery.com/)
-
-## Explore
-
-Try it out by installing the requirements (the following commands work only with Python 3.8 and higher, due to Django 4):
-
-```
-pip install -r requirements.txt
+Use this command to create a Kubernetes cluster:
+```bash
+kind create cluster --config=cluster.yml
 ```
 
-Create a database schema:
-
+Apply the RBAC Configuration
+```bash
+kubectl apply -f security/rbac.yml
 ```
-python manage.py migrate
+
+Deploy the App
+```bash
+./bootstrap.sh
+```
+
+## How to validate the Deployment
+
+Access the Pod's Shell:`
+```bash
+kubectl exec -it <pod_name> -n todoapp -- sh
+```
+
+Set Up Variables:
+```bash
+Inside the shell, define the variables for the API server, token, and CA certificate:
+APISERVER=https://kubernetes.default.svc
+SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
+TOKEN=$(cat ${SERVICEACCOUNT}/token)
+CACERT=${SERVICEACCOUNT}/ca.crt
+```
+
+Execute the Curl Command to List Pods
+```bash
+curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/todoapp/pods
 ```
 
 And then start the server (default is http://localhost:8000):
+## Check the ServiceAccount
 
+To confirm the ServiceAccount is correctly created:
+```bash
+kubectl get serviceaccount -n <namespace> <serviceaccount_name>
+```
+
+## Verify the Role
+~~~~
+```bash
+kubectl get role -n <namespace> <role_name>
 ```
 python manage.py runserver
+## Validate the RoleBinding
+```bash
+kubectl get rolebinding -n <namespace> <rolebinding_name>
 ```
-
 Now you can browse the [API](http://localhost:8000/api/) or start on the [landing page](http://localhost:8000/).
-
+## Check for Errors
 ## Task
-
-1. Fork this repository.
-1. Use `kind` to spin up a cluster from a `cluster.yml` configuration file.
-1. Create a manifest  named `rbac` inside a `security` directory
-1. `rbac` manifest requirements:
-    1. File should containa `ServiceAccount` definition
-    1. File should contain a `Role` definition
-    1. Role should allow to list secrets
-    1. File should contain a `RoleBinding` definition
-    1. RoleBinding should bind the `Role` to the `ServiceAccount`
-1. Use newly created `ServiceAccount` should be used by the `Deployment` in the `deployment` manifest
-1. Execute a curl command to list secrets from the `Deployment` pod to list secrets
-1. Make a screenshot of the output and attach it to the PR
-1. `README.md` should have instructuions on how to validate the changes
-1. Create PR with your changes and attach it for validation on a platform.
+```bash
+kubectl describe serviceaccount -n <namespace> <serviceaccount_name>
+kubectl describe role -n <namespace> <role_name>
+kubectl describe rolebinding -n <namespace> <rolebinding_name>
+```
