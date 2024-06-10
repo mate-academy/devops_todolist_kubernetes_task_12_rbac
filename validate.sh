@@ -2,42 +2,9 @@
 
 set -e
 
-# Step 1: Create RBAC Manifest
-echo "Creating RBAC manifest..."
-mkdir -p security
-cat <<EOF > security/rbac.yml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: todoapp-sa
-  namespace: todoapp
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: secret-reader
-  namespace: todoapp
-rules:
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["get", "list"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: read-secrets-binding
-  namespace: todoapp
-subjects:
-- kind: ServiceAccount
-  name: todoapp-sa
-  namespace: todoapp
-roleRef:
-  kind: Role
-  name: secret-reader
-  apiGroup: rbac.authorization.k8s.io
-EOF
-
-if kubectl apply -f security/rbac.yml; then
+# Step 1: Apply RBAC Manifest
+echo "Applying RBAC manifest from C:/Users/shche/mate/kubernetes/devops_todolist_kubernetes_task_12_rbac/.infrastructure/Security/rbac.yml..."
+if kubectl apply -f C:/Users/shche/mate/kubernetes/devops_todolist_kubernetes_task_12_rbac/.infrastructure/Security/rbac.yml; then
   echo "RBAC manifest applied successfully 😊"
 else
   echo "Failed to apply RBAC manifest 😶‍🌫️"
@@ -80,4 +47,4 @@ else
   exit 1
 fi
 
-echo "Validation complete. Please take a screenshot of the above output."
+echo "Validation complete."
