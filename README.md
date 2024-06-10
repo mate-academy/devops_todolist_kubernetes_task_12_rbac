@@ -43,3 +43,20 @@ Now you can browse the [API](http://localhost:8000/api/) or start on the [landin
 1. Make a screenshot of the output and attach it to the PR
 1. `README.md` should have instructuions on how to validate the changes
 1. Create PR with your changes and attach it for validation on a platform.
+
+
+Readme updated:
+
+1. Start cluster:
+```sh
+kind create cluster --config=cluster.yml
+```
+2. Run project:
+```sh
+./bootstrap.sh
+```
+
+3. Use script to set up the RBAC, modify the deployment, and validate the changes:
+```sh
+./validate.sh
+```
