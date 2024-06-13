@@ -13,7 +13,7 @@ metadata:
   namespace: todoapp
 rules:
   - apiGroups: [""]
-    resources: ["pods"]
+    resources: ["secrets"]
     verbs: ["list"]
 
 ---
