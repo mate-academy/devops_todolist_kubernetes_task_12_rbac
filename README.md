@@ -3,7 +3,7 @@
 This is a todo list web application with basic features of most web apps, i.e., accounts/login, API, and interactive UI. To do this task, you will need:
 
 - CSS | [Skeleton](http://getskeleton.com/)
-- JS  | [jQuery](https://jquery.com/)
+- JS | [jQuery](https://jquery.com/)
 
 ## Explore
 
@@ -31,15 +31,55 @@ Now you can browse the [API](http://localhost:8000/api/) or start on the [landin
 
 1. Fork this repository.
 1. Use `kind` to spin up a cluster from a `cluster.yml` configuration file.
-1. Create a manifest  named `rbac` inside a `security` directory
+1. Create a manifest named `rbac` inside a `security` directory
 1. `rbac` manifest requirements:
-    1. File should containa `ServiceAccount` definition
-    1. File should contain a `Role` definition
-    1. Role should allow to list secrets
-    1. File should contain a `RoleBinding` definition
-    1. RoleBinding should bind the `Role` to the `ServiceAccount`
+   1. File should containa `ServiceAccount` definition
+   1. File should contain a `Role` definition
+   1. Role should allow to list secrets
+   1. File should contain a `RoleBinding` definition
+   1. RoleBinding should bind the `Role` to the `ServiceAccount`
 1. Use newly created `ServiceAccount` should be used by the `Deployment` in the `deployment` manifest
 1. Execute a curl command to list secrets from the `Deployment` pod to list secrets
 1. Make a screenshot of the output and attach it to the PR
 1. `README.md` should have instructuions on how to validate the changes
 1. Create PR with your changes and attach it for validation on a platform.
+
+1. You could recreate cluster if you need it by running command below
+
+```
+kind delete cluster
+kind create cluster --config cluster.yml
+```
+
+2. To deploying all the required resources in the cluster run command
+
+```
+sh bootstrap.sh
+```
+
+3. Get one pod name on todoapp namespace
+
+```
+kubectl get pods -o wide -n todoapp
+```
+
+4. Connect to shell of running pod
+
+```
+kubectl exec -it <one of running pod name> -n todoapp -- sh
+```
+
+5. Create variables inside pod for running get request to API-server with RBAC service account
+
+```
+SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
+APISERVER=https://kubernetes.default.svc
+TOKEN=$(cat ${SERVICEACCOUNT}/token)
+CACERT=${SERVICEACCOUNT}/ca.crt
+```
+
+6. Make get request and find secret ENV variables
+
+```
+curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/todoapp/secrets
+```
