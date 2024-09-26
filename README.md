@@ -73,6 +73,6 @@ CACERT=${SERVICEACCOUNT}/ca.crt
 
 5. Execute the Curl Command to List Pods
 ```bash
-curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/todoapp/pods
+curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/todoapp/secrets
 ```
 
