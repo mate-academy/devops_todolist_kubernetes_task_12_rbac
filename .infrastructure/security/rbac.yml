@@ -26,7 +26,6 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: secrets-lister
-  namespace: todoapp
 roleRef:
   kind: Role
   name: secret-lister
