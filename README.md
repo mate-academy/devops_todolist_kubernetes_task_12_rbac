@@ -42,4 +42,18 @@ Now you can browse the [API](http://localhost:8000/api/) or start on the [landin
 1. Execute a curl command to list secrets from the `Deployment` pod to list secrets
 1. Make a screenshot of the output and attach it to the PR
 1. `README.md` should have instructuions on how to validate the changes
+
+Connect to cluster's pod:
+
+```
+kubectl exec todoapp-{random symbols} -it -n todoapp -- sh
+```
+
+Check secrets:
+
+```
+curl -k -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+https://kubernetes.default.svc/api/v1/namespaces/todoapp/secrets
+```
+
 1. Create PR with your changes and attach it for validation on a platform.
