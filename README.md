@@ -43,3 +43,34 @@ You can now browse the [API](http://localhost:8000/api/) or start on the [landin
 1. Make a screenshot of the output and attach it to the PR
 1. Create the `INSTRUCTION.md` with instructions on how to validate the changes
 1. Create PR with your changes and attach it for validation on a platform.
+
+
+
+##### How to deploy
+
+1) Start kubernetes cluster with kind
+
+kind create cluster --config=cluster.yml
+
+2) Run app
+
+bash bootstrap.sh
+
+3) apply rbac.yml
+
+kubectl apply -f security/rbac.yml
+
+4) Access pod
+
+kubectl exec <pod-name> -it -n todoapp -- sh
+
+5) Inside the pod set up variables
+
+APISERVER=https://kubernetes.default.svc
+SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
+TOKEN=$(cat ${SERVICEACCOUNT}/token)
+CACERT=${SERVICEACCOUNT}/ca.crt
+
+6) Execute curl to list secrets
+
+curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/todoapp/secrets
