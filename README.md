@@ -43,3 +43,70 @@ You can now browse the [API](http://localhost:8000/api/) or start on the [landin
 1. Make a screenshot of the output and attach it to the PR
 1. Create the `INSTRUCTION.md` with instructions on how to validate the changes
 1. Create PR with your changes and attach it for validation on a platform.
+
+
+---
+
+### Validation
+
+Verify the `Role` is created:
+
+```bash
+kubectl get roles -n todoapp
+```
+Expected output:
+```yaml
+NAME             CREATED AT
+secrets-reader   2024-07-11T10:33:47Z
+```
+Describe the `Role` to ensure it allows listing secrets:
+
+```bash
+kubectl describe role secrets-reader -n todoapp
+```
+Expected output:
+```yaml
+Name:         secrets-reader
+Labels:       <none>
+Annotations:  <none>
+PolicyRule:
+  Resources  Non-Resource URLs  Resource Names  Verbs
+  ---------  -----------------  --------------  -----
+  secrets    []                 []              [list]
+```
+
+Verify the `RoleBinding` is created :
+
+```bash
+kubectl get rolebinding -n todoapp
+```
+Expected output:
+```yaml
+NAME                     ROLE                  AGE
+secrets-reader-binding   Role/secrets-reader   19m
+```
+Describe the `RoleBinding` to ensure it properly binds the `Role` to the `ServiceAccount`:
+```bash
+kubectl describe rolebinding secrets-reader-binding -n todoapp
+```
+Expected output:
+```yaml
+Name:         secrets-reader-binding
+Labels:       <none>
+Annotations:  <none>
+Role:
+  Kind:  Role
+  Name:  secrets-reader
+Subjects:
+  Kind            Name            Namespace
+  ----            ----            ---------
+  ServiceAccount  secrets-reader
+```
+Check the `ServiceAccount` is used by the `Deployment`:
+```bash
+kubectl get deployment todoapp -n todoapp -o jsonpath='{.spec.template.spec.serviceAccountName}'
+```
+Expected output:
+```yaml
+secrets-reader
+```
