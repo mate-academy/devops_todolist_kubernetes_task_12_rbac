@@ -43,3 +43,39 @@ You can now browse the [API](http://localhost:8000/api/) or start on the [landin
 1. Make a screenshot of the output and attach it to the PR
 1. Create the `INSTRUCTION.md` with instructions on how to validate the changes
 1. Create PR with your changes and attach it for validation on a platform.
+
+
+
+### How to validate the changes
+
+1. Get pod names:
+
+```
+kubectl get pods -n todoapp
+```
+2. Use <pod-name> to enter its shell:
+
+```
+kubectl exec -it <pod-name> -n todoapp -- sh
+```
+
+3. Set up variables:
+
+```
+APISERVER=https://kubernetes.default.svc
+SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
+TOKEN=$(cat ${SERVICEACCOUNT}/token)
+CACERT=${SERVICEACCOUNT}/ca.crt
+```
+
+4. Execute the Curl Command to List Pods:
+
+```
+curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/todoapp/pods
+```
+
+5. Execute the Curl Command to List Secrets:
+
+```
+curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/todoapp/pods
+```
