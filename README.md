@@ -43,3 +43,36 @@ You can now browse the [API](http://localhost:8000/api/) or start on the [landin
 1. Make a screenshot of the output and attach it to the PR
 1. Create the `INSTRUCTION.md` with instructions on how to validate the changes
 1. Create PR with your changes and attach it for validation on a platform.
+
+
+## Steps to Deploy
+
+1.Use kind to create a Kubernetes cluster:
+```bash
+kind create cluster --config=cluster.yml
+```
+
+2.Deploy the Application
+```bash
+./bootstrap.sh
+```
+
+3. Access the Pod's Shell:`
+```bash
+kubectl exec -it <pod-name> -n todoapp -- sh
+```
+
+4. Set Up the Necessary Variables:
+```bash
+Inside the shell, define the variables for the API server, token, and CA certificate:
+APISERVER=https://kubernetes.default.svc
+SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
+TOKEN=$(cat ${SERVICEACCOUNT}/token)
+CACERT=${SERVICEACCOUNT}/ca.crt
+```
+
+5. Execute the Curl Command to List Pods
+```bash
+curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/todoapp/secrets
+```
+
