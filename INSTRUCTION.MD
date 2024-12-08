@@ -31,4 +31,4 @@ curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISE
 ```
 
 ## 6. Verify the Output.
-The response should include the details of the secrets in the todoapp namespace.
+The response should include the details of the secrets in the todoapp namespace. 
