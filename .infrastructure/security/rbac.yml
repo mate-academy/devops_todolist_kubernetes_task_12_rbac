@@ -1,0 +1,33 @@
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  name: secrets-reader
+  namespace: todoapp
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: todoapp # This is the namespace where the role will be created
+  name: secrets-lister-role # This is the name of the role
+rules:
+  - apiGroups: [""] # "" indicates the core API group, which includes all core APIs
+    resources: ["pods", "secrets"] # Indicates the resources that the role can access, in this case, pods
+    verbs: ["list", "get", "watch"] # Indicates the actions that the role can perform on the resources
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: secrets-lister-role-binding
+ namespace: todoapp
+subjects:
+  - kind: ServiceAccount # this can also be "Group" or "ServiceAccount".
+    name: secrets-reader # name of the user, group or service account.
+    apiGroup: rbac.authorization.k8s.io # this is always "rbac.authorization.k8s.io".
+roleRef:
+  kind: Role # this must be Role or ClusterRole.
+  name: secrets-lister-role # name of the Role or ClusterRole to bind.
+  apiGroup: rbac.authorization.k8s.io # this is always "rbac.authorization.k8s.io"
+
+
