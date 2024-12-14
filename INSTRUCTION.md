@@ -24,7 +24,7 @@ and replace 'kind-kind' with your context
 ## 4. Connect to a pod:
 Replace <pod name> with your pod name
 ```bash
-kubectl exec <pod name> -it
+kubectl exec -n todoapp <pod name> -it -- sh
 ```
 
 ## 5. Set Up and Execute the CURL Command:
