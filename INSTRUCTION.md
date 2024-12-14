@@ -13,11 +13,12 @@ kind create cluster --config cluster.yml
 
 ## 3. Wait for 2 minutes for all pods to initialize. Once ready, verify pods status:
 ```bash
-kubectl get pods -n todoapp --context kind-kind
+kubectl get pods -n todoapp
 ```
 If this command does not show you information about your pods, try verifing cluster name using command:
 ```bash
 kubectl config current-context
+kubectl get pods -n todoapp --context <current context>
 ```
 and replace 'kind-kind' with your context
 
