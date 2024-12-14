@@ -12,22 +12,22 @@ metadata:
   name: secret-lister-role
   namespace: todoapp
 rules:
-- apiGroups: [""]
-  resources: ["secrets"]
-  verbs: ["list"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["list"]
 
 ---
 
-aouVersion: rbac.authorization.k8s.io/v1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: secret-lister-binding
   namespace: todoapp
-subject:
+subjects:
   - kind: ServiceAccount
     name: secret-lister
     namespace: todoapp
 roleRef:
-  - kind: Role
-    name: secret-lister-role
-    apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: secret-lister-role
+  apiGroup: rbac.authorization.k8s.io
