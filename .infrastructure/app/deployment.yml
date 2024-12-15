@@ -12,12 +12,13 @@ spec:
   selector:
     matchLabels:
       app: todoapp
+  replicas: 2
   template:
     metadata:
       labels:
         app: todoapp
     spec:
-      serviceAccountName: secrets-reader
+      serviceAccountName: list-pods-sa
       containers:
       - name: todoapp
         image: ikulyk404/todoapp:4.0.1
