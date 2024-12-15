@@ -51,11 +51,3 @@ nodes:
   extraMounts:
     - hostPath: /tmp
       containerPath: /data
-- role: worker
-  extraMounts:
-    - hostPath: /tmp
-      containerPath: /data
-- role: worker
-  extraMounts:
-    - hostPath: /tmp
-      containerPath: /data
