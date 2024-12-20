@@ -43,3 +43,34 @@ You can now browse the [API](http://localhost:8000/api/) or start on the [landin
 1. Make a screenshot of the output and attach it to the PR
 1. Create the `INSTRUCTION.md` with instructions on how to validate the changes
 1. Create PR with your changes and attach it for validation on a platform.
+
+
+
+# -----------------------------
+
+# Cluster creation:
+
+kubectl create cluster --config cluster.yml
+
+# Apply all manifests:
+
+./bootstrap.sh
+
+# Check availability of pods:
+
+kubectl get pods -n todoapp
+
+# Go inside the pod:
+
+kubectl exec <name-pod> -it -n todoapp -- sh
+
+# Now let's make a query using these variables:
+
+APISERVER=https://kubernetes.default.svc
+SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
+TOKEN=$(cat ${SERVICEACCOUNT}/token)
+CACERT=${SERVICEACCOUNT}/ca.crt
+
+# Let's make a curl request:
+
+curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/todoapp/pods
