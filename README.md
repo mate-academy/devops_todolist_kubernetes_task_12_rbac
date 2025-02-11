@@ -84,5 +84,5 @@ CACERT=${SERVICEACCOUNT}/ca.crt
 curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/todoapp/secrets
 ```
 
-![Screenshot](screenshots/image.jpg)
+![Screenshot](screenshots/image.png)
 ![Screenshot](screenshots/image1.jpg)
