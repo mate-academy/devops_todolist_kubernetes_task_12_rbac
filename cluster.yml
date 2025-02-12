@@ -1,18 +1,15 @@
+# this config file contains all config fields with comments
+# NOTE: this is not a particularly useful config file
 apiVersion: kind.x-k8s.io/v1alpha4
 kind: Cluster
-networking:
-  apiServerAddress: "127.0.0.1"
-  apiServerPort: 16443
-
-# Patch the generated kubeadm config with some extra settings
+# patch the generated kubeadm config with some extra settings
 kubeadmConfigPatches:
 - |
   apiVersion: kubelet.config.k8s.io/v1beta1
   kind: KubeletConfiguration
   evictionHard:
     nodefs.available: "0%"
-
-# Patch it further using a JSON 6902 patch
+# patch it further using a JSON 6902 patch
 kubeadmConfigPatchesJSON6902:
 - group: kubeadm.k8s.io
   version: v1beta3
@@ -20,10 +17,10 @@ kubeadmConfigPatchesJSON6902:
   patch: |
     - op: add
       path: /apiServer/certSANs/-
-      value: 127.0.0.1
-
+      value: my-hostname
+# 2 control plane node and 2 workers
 nodes:
-# The control plane node config
+# the control plane node config
 - role: control-plane
   extraMounts:
     - hostPath: /tmp
@@ -45,8 +42,7 @@ nodes:
   - containerPort: 443
     hostPort: 443
     protocol: TCP
-
-# The worker node configurations
+# the two workers
 - role: worker
   extraMounts:
     - hostPath: /tmp
