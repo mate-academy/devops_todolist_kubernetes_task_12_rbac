@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: secrets-reader
+  namespace: todoapp
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-lister
+  namespace: todoapp
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["list","get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-lister-binding
+  namespace: todoapp
+subjects:
+- kind: ServiceAccount
+  name: secrets-reader
+  namespace: todoapp
+roleRef:
+  kind: Role
+  name: pod-lister
+  apiGroup: rbac.authorization.k8s.io
