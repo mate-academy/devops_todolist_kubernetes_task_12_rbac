@@ -5,3 +5,7 @@ metadata:
   namespace: todoapp
 data:
   PYTHONUNBUFFERED: "1"
+  SERVICEACCOUNT: "/var/run/secrets/kubernetes.io/serviceaccount"
+  APISERVER: "https://kubernetes.default.svc"
+
+
