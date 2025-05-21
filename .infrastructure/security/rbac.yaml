@@ -1,0 +1,36 @@
+# ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: secrets-reader
+  namespace: todoapp
+
+---
+
+# Role — доступ до секретів у todoapp
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: secrets-reader-role
+  namespace: todoapp
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+
+---
+
+# RoleBinding — прив’язка до ServiceAccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: secrets-reader-binding
+  namespace: todoapp
+subjects:
+- kind: ServiceAccount
+  name: secrets-reader
+  namespace: todoapp
+roleRef:
+  kind: Role
+  name: secrets-reader-role
+  apiGroup: rbac.authorization.k8s.io
