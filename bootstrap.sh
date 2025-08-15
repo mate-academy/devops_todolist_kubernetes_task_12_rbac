@@ -6,7 +6,7 @@ kubectl apply -f .infrastructure/mysql/service.yml
 kubectl apply -f .infrastructure/mysql/statefulSet.yml
 
 kubectl apply -f .infrastructure/app/ns.yml
-kubectl apply -f .infrastructure/security/rbac.yml
+kubectl apply -f .infrastructure/security/rbac
 kubectl apply -f .infrastructure/app/pv.yml
 kubectl apply -f .infrastructure/app/pvc.yml
 kubectl apply -f .infrastructure/app/secret.yml

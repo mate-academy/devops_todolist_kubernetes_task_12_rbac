@@ -13,5 +13,7 @@ kubectl describe pod <pod_name> -n todoapp
 	9.	Підключитися до пода і перевірити доступ до секретів
 Виконайте команду, щоб відкрити shell у контейнері:
 kubectl exec -it <pod_name> -n todoapp – /bin/sh
-Виконайте команду всередині пода, щоб отримати список секретів:
-kubectl get secrets
+Виконайте команду всередині пода:
+TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+curl -sSk -H "Authorization: Bearer $TOKEN" https://kubernetes.default.svc/api/v1/namespaces/$NAMESPACE/secrets
