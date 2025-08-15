@@ -4,7 +4,7 @@ bash bootstrap.sh
 	2.	Перевірити, що кластер запущений та ноди доступні:
     3.	Створити RBAC ресурси
 Створіть ServiceAccount, Role та RoleBinding:
-kubectl apply -f .infrastructure/security/rbac.yml
+kubectl apply -f .infrastructure/security/rbac
 	4.	Перевірити, що ServiceAccount створений
 kubectl get serviceaccounts -n todoapp
 8.	Перевірити стан подів
