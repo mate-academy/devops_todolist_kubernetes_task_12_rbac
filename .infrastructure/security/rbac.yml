@@ -13,8 +13,8 @@ metadata:
   namespace: todoapp
 rules:
   - apiGroups: [""]
-    resources: ["pods"]
-    verbs: ["list", "get"]
+    resources: ["secrets"]
+    verbs: ["list"]
 
 ---
 
@@ -27,6 +27,6 @@ subjects:
   - kind: ServiceAccount
     name: secret-listener
 roleRef:
-  - kind: Role
+    kind: Role
     name: secret-listener
     apiGroup: rbac.authorization.k8s.io
