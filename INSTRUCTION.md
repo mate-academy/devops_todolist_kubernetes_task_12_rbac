@@ -1,8 +1,8 @@
 ### Resource check
 
-kubectl get serviceaccount secrets-reader -n todoapp
-kubectl get role secrets-reader -n todoapp -o yaml
-kubectl get rolebinding secrets-reader-binding -n todoapp -o yaml
+kubectl get serviceaccount secret-listener -n todoapp
+kubectl get role secret-listener -n todoapp -o yaml
+kubectl get rolebinding secret-listener-binding -n todoapp -o yaml
 
 ###  Deployment use valid ServiceAccount:
 kubectl get deploy todoapp -n todoapp -o jsonpath='{.spec.template.spec.serviceAccountName}'
