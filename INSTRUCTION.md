@@ -67,11 +67,7 @@ kubectl exec -it <pod-name> -n todoapp -- sh
 And execute:
 
 ```bash
-curl http://127.0.0.1:8001/api/v1/namespaces/todoapp/secrets
-```
-
-Or check mounted secrets:
-
-```bash
-ls -l /app/secrets
+TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+curl --cacert $CACERT --header "Authorization: Bearer $TOKEN" https://kubernetes.default.svc/api/v1/namespaces/todoapp/secrets
 ```
