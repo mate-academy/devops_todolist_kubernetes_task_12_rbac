@@ -1,0 +1,44 @@
+---
+# ServiceAccount для приложения todolist
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: todolist-service-account
+  namespace: default
+  labels:
+    app: todolist
+    component: rbac
+
+---
+# Role с правами на чтение секретов
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: secrets-reader-role
+  labels:
+    app: todolist
+    component: rbac
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+
+---
+# RoleBinding связывает Role с ServiceAccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: todolist-secrets-reader-binding
+  namespace: default
+  labels:
+    app: todolist
+    component: rbac
+subjects:
+  - kind: ServiceAccount
+    name: todolist-service-account
+    namespace: default
+roleRef:
+  kind: Role
+  name: secrets-reader-role
+  apiGroup: rbac.authorization.k8s.io
