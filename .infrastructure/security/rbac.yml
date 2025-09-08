@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: todolist-sa
+  namespace: todo
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: todolist-reader
+  namespace: todo
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: todolist-reader-binding
+  namespace: todo
+subjects:
+  - kind: ServiceAccount
+    name: todolist-sa
+    namespace: todo
+roleRef:
+  kind: Role
+  name: todolist-reader
+  apiGroup: rbac.authorization.k8s.io
