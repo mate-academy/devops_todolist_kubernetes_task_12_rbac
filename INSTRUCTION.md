@@ -23,7 +23,7 @@ kubectl apply -f .infrastructure/security/rbac.yml
 
 This will create:
 
-* A ServiceAccount (`secrets-reader`) in the `todoapp` namespace
+* A ServiceAccount (`todoapp-sa`) in the `todoapp` namespace
 * A Role that allows list access on secrets
 * A RoleBinding to connect the ServiceAccount with the Role
 
@@ -41,7 +41,7 @@ kubectl apply -f .infrastructure/deployment.yml
 
 ## 4. Verify the ServiceAccount
 
-Check that the `todoapp` pod is using the `secrets-reader` ServiceAccount:
+Check that the `todoapp` pod is using the `todoapp-sa` ServiceAccount:
 
 ```bash
 kubectl get pod -n todoapp -o jsonpath="{.items[0].spec.serviceAccountName}"
@@ -50,7 +50,7 @@ kubectl get pod -n todoapp -o jsonpath="{.items[0].spec.serviceAccountName}"
 **Expected output:**
 
 ```bash
-secrets-reader
+todoapp-sa
 ```
 
 ## 5. Execute a Curl Command Inside the Pod
