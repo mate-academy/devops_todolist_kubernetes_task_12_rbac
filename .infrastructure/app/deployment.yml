@@ -17,6 +17,7 @@ spec:
       labels:
         app: todoapp
     spec:
+      replicas: 1
       serviceAccountName: service-account
       containers:
       - name: todoapp
