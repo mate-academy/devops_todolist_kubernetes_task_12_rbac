@@ -1,7 +1,7 @@
 kind create cluster --config cluster.yml
 
 kubectl create namespace todoapp
-kubectl apply ./infrastructure/ -R
+kubectl apply -R -f ./infrastructure/ 
 
 kubectl exec -n todoapp -it $(kubectl get pod -n todoapp -l app=todoapp -o jsonpath='{.items[0].metadata.name}') -- sh
 
