@@ -4,7 +4,8 @@
     kind create cluster --name todo-cluster --config cluster.yml
     kubectl create namespace todoapp
     kubectl create namespace mysql
-    kubectl apply -f bootstrap.sh
+    chmod +x bootstrap.sh
+    kubectl apply -f ./bootstrap.sh
 
 2. Apply rbac:
 
