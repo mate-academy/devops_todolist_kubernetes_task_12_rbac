@@ -9,7 +9,7 @@
 2. Apply rbac:
 
 
-    kubectl apply -f security/rbac.yaml
+    kubectl apply -f security/rbac.yml
 
 3. Check permissions to secrets from the pod:
 
