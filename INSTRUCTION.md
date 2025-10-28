@@ -5,7 +5,7 @@
     kubectl create namespace todoapp
     kubectl create namespace mysql
     chmod +x bootstrap.sh
-    kubectl apply -f ./bootstrap.sh
+    ./bootstrap.sh
 
 2. Apply rbac:
 
