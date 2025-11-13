@@ -17,13 +17,11 @@ spec:
       labels:
         app: todoapp
     spec:
-      serviceAccountName: secrets-reader
+      serviceAccountName: pods-lister
       containers:
       - name: todoapp
         image: ikulyk404/todoapp:4.0.1
         volumeMounts:
-        - name: data
-          mountPath: /app/data
         - name: app-secrets-volume
           mountPath: "/app/secrets"
           readOnly: true
@@ -83,9 +81,6 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: pvc-data
       - name: app-secrets-volume
         secret:
           secretName: app-secret
