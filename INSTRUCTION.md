@@ -18,10 +18,5 @@ kubectl apply -f .infrastructure/app/deployment.yml
 kubectl get pods
 
 # Виконайте команду curl всередині поду для отримання списку секретів:
-kubectl exec -it todoapp-675bb7c66b-2fz6b -n todoapp -- sh
-
-SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
-APISERVER=https://kubernetes.default.svc
-TOKEN=$(cat ${SERVICEACCOUNT}/token)
-CACERT=${SERVICEACCOUNT}/ca.crt
-curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/api/v1/namespaces/todoapp/pods
+kubectl exec -n todoapp -it <pod-name> -- sh -c 'curl -s --header "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+https://kubernetes.default.svc/api/v1/namespaces/todoapp/secrets --insecure'
