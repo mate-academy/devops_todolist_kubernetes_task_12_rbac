@@ -27,7 +27,7 @@ A ServiceAccount named secrets-reader should exist.
 
 ```bash
 kubectl get role -n todoapp
-kubectl describe role secrets-reader -n todoapp
+kubectl describe role secret-lister -n todoapp
 ```
 
 Expected result:
@@ -43,13 +43,13 @@ verbs: ["list"]
 
 ```bash
 kubectl get rolebinding -n todoapp
-kubectl describe rolebinding secrets-reader-binding -n todoapp
+kubectl describe rolebinding secret-lister-binding -n todoapp
 ```
 
 Expected result:
 
 The RoleBinding should bind:
-Role: secrets-reader
+Role: secret-lister
 ServiceAccount: secrets-reader
 
 ## Validate That The Pod Can List Secrets
