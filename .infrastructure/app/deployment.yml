@@ -4,6 +4,7 @@ metadata:
   name: todoapp
   namespace: todoapp
 spec:
+  serviceAccountName: secrets-reader
   strategy:
     type: RollingUpdate
     rollingUpdate:
