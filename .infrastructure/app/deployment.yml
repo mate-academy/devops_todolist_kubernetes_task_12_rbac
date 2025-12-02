@@ -17,6 +17,7 @@ spec:
       labels:
         app: todoapp
     spec:
+      # ВАЖНО: именно здесь должна быть ссылка на ServiceAccount
       serviceAccountName: secrets-reader
       containers:
       - name: todoapp
