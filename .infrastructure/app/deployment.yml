@@ -80,7 +80,7 @@ spec:
           httpGet:
             path: api/ready
             port: 8080
-          initialDelaySeconds: 5
+          initialDelaySeconds: 60
           periodSeconds: 5
       volumes:
       - name: data
