@@ -2,8 +2,6 @@
 
 echo "Starting deployment..."
 
-kubectl apply -f .infrastructure/app/ns.yml 2>/dev/null || kubectl apply -f .infrastructure/namespace.yml
-
 echo "Applying RBAC rules..."
 kubectl apply -f .infrastructure/security/rbac.yml
 
