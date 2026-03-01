@@ -59,8 +59,8 @@ kubectl apply -f app/hpa.yml
 
 ```bash
 kubectl get serviceaccount secrets-reader -n todoapp
-kubectl get role secrets-reader-role -n todoapp
-kubectl get rolebinding secrets-reader-rolebinding -n todoapp
+kubectl get role secrets-reader -n todoapp
+kubectl get rolebinding secrets-reader -n todoapp
 ```
 
 Expected output — all three resources should be listed.
