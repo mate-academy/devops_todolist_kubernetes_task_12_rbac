@@ -25,7 +25,7 @@ sh bootstrap.sh
 Verify the resources were created:
 
 ```bash
-kubectl get sa,role,rolebinding -n <namespace>
+kubectl get sa,role,rolebinding -n todoapp
 ```
 
 Expected: ServiceAccount, Role and RoleBinding are present.
@@ -37,13 +37,13 @@ Expected: ServiceAccount, Role and RoleBinding are present.
 Get the pod name:
 
 ```bash
-kubectl get pods -n <namespace>
+kubectl get pods -n todoapp
 ```
 
 Exec into the pod:
 
 ```bash
-kubectl exec -it <pod-name> -n <namespace> -- sh
+kubectl exec -it <pod-name> -n todoapp -- sh
 ```
 
 Run curl inside the pod:
