@@ -17,6 +17,7 @@ spec:
       labels:
         app: todoapp
     spec:
+      # The Deployment is configured to use the new ServiceAccount (RBAC: can list secrets).
       serviceAccountName: secrets-reader
       containers:
       - name: todoapp
