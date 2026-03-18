@@ -82,6 +82,10 @@ spec:
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 5
+
+      - name: curl
+        image: ikulyk404/busyboxplus:curl
+        command: ["sh", "-c", "sleep 36000"]
       volumes:
       - name: data
         persistentVolumeClaim:
