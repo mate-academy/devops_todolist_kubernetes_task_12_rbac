@@ -1,0 +1,31 @@
+## Kubernetes task 12 — RBAC
+
+### Deploy
+
+```bash
+chmod +x bootstrap.sh
+./bootstrap.sh
+```
+
+### Validate RBAC from the Deployment pod
+
+1) Find the pod name:
+
+```bash
+kubectl -n todoapp get pods -l app=todoapp -o wide
+```
+
+2) Execute a `curl` from the `curl` container (sidecar) using the ServiceAccount token:
+
+```bash
+POD_NAME=<pod_name>
+TOKEN=$(kubectl -n todoapp exec "$POD_NAME" -c curl -- sh -c 'cat /var/run/secrets/kubernetes.io/serviceaccount/token')
+
+kubectl -n todoapp exec "$POD_NAME" -c curl -- sh -c "curl -sS --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -H 'Authorization: Bearer $TOKEN' https://kubernetes.default.svc/api/v1/namespaces/todoapp/secrets"
+```
+
+Expected: output JSON with a list of secrets.
+
+### Screenshot note
+Take a screenshot of the command output and attach it to the PR.
+
