@@ -7,7 +7,7 @@
 ## Setup
 1. Create kind cluster:
 ```bash
-kind create cluster --name todoapp-cluster
+kind create cluster --name todoapp-cluster --config cluster.yml
 
 Create namespace:
 
@@ -35,4 +35,4 @@ Exec into pod and list secrets:
 kubectl exec -n todoapp <pod-name> -- sh -c 'TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token); curl -s -H "Authorization: Bearer $TOKEN" https://kubernetes.default.svc/api/v1/namespaces/todoapp/secrets'
 Expected: JSON response with secrets list.
 Cleanup
-kind delete cluster --name t
+kind delete cluster --name todoapp-cluster
