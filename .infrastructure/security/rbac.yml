@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: secrets-reader
+  namespace: todoapp
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: secret-reader-role
+  namespace: todoapp
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bind-secret-reader
+  namespace: todoapp
+subjects:
+- kind: ServiceAccount
+  name: secrets-reader
+  namespace: todoapp
+roleRef:
+  kind: Role
+  name: secret-reader-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secrets-reader-token
+  namespace: todoapp
+  annotations:
+    kubernetes.io/service-account.name: secrets-reader
+type: kubernetes.io/service-account-token
