@@ -27,12 +27,3 @@ roleRef:
   kind: Role
   name: secret-reader-role
   apiGroup: rbac.authorization.k8s.io
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: secrets-reader-token
-  namespace: todoapp
-  annotations:
-    kubernetes.io/service-account.name: secrets-reader
-type: kubernetes.io/service-account-token
