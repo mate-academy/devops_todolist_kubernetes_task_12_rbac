@@ -1,45 +1,30 @@
-# Django ToDo list
+# Kubernetes Security: RBAC Implementation
 
-This is a to-do list web application with the basic features of most web apps, i.e., accounts/login, API, and interactive UI. To do this task, you will need:
+## 📖 Project Overview
+This project highlights a critical aspect of Kubernetes administration: security governance. It demonstrates the practical implementation of **Kubernetes Role-Based Access Control (RBAC)** to enforce the principle of least privilege, ensuring that application workloads only have the minimum permissions necessary to function.
 
-- CSS | [Skeleton](http://getskeleton.com/)
-- JS  | [jQuery](https://jquery.com/)
+## 🛠 Tech Stack & Tools
+* **Container Orchestration:** Kubernetes (kind cluster)
+* **Security & IAM:** Kubernetes RBAC (ServiceAccounts, Roles, RoleBindings)
+* **API Interaction:** cURL
 
-## Explore
+## ⚙️ Implementation Details
+The security posture of the application was hardened through the following steps:
+1. **ServiceAccount Provisioning:** Created a dedicated `ServiceAccount` specific to the application deployment, moving away from the insecure practice of using the `default` namespace account.
+2. **Role Definition:** Configured a custom Kubernetes `Role` that explicitly grants read-only access (the ability to `list`) to Kubernetes `Secrets` within the specific namespace.
+3. **RoleBinding:** Securely mapped the custom `Role` to the newly created `ServiceAccount` via a `RoleBinding`, bridging the identity with the permission set.
+4. **Pod Integration:** Updated the application's Deployment manifest to run utilizing the customized `ServiceAccount`.
 
-Try it out by installing the requirements (the following commands work only with Python 3.8 and higher, due to Django 4):
+## 📸 Security Validation
+To prove the RBAC configuration was successful, an API validation test was executed. A `curl` command was run directly from within the application pod, successfully authenticating against the Kubernetes API and listing the secrets based on the granted permissions.
 
-```
-pip install -r requirements.txt
-```
+<details>
+<summary><b>RBAC API Execution Test Screenshot</b> (Click to expand)</summary>
+<br>
+<img src="./SCREEN_exec.png" alt="Kubernetes RBAC Exec Test">
+</details>
 
-Create a database schema:
+## 📝 Code Review & Approval
+This security configuration has been rigorously reviewed by a Senior DevOps Engineer to ensure correct implementation of IAM policies within the cluster.
 
-```
-python manage.py migrate
-```
-
-And then start the server (default is http://localhost:8000):
-
-```
-python manage.py runserver
-```
-
-You can now browse the [API](http://localhost:8000/api/) or start on the [landing page](http://localhost:8000/).
-
-## Task
-
-1. Fork this repository.
-1. Use `kind` to spin up a cluster from a `cluster.yml` configuration file.
-1. Create a manifest  named `rbac` inside a `security` directory
-1. `rbac` manifest requirements:
-    1. File should contain a `ServiceAccount` definition
-    1. File should contain a `Role` definition
-    1. Role should allow to list secrets
-    1. File should contain a `RoleBinding` definition
-    1. RoleBinding should bind the `Role` to the `ServiceAccount`
-1. Use newly created `ServiceAccount` should be used by the `Deployment` in the `deployment` manifest
-1. Execute a curl command to list secrets from the `Deployment` pod to list secrets
-1. Make a screenshot of the output and attach it to the PR
-1. Create the `INSTRUCTION.md` with instructions on how to validate the changes
-1. Create PR with your changes and attach it for validation on a platform.
+You can view the full discussion, implementation details, and final approval in the **[Pull Request #67](https://github.com/mate-academy/devops_todolist_kubernetes_task_12_rbac/pull/67)**.
