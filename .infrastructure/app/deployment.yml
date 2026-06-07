@@ -17,7 +17,6 @@ spec:
       labels:
         app: todoapp
     spec:
-      serviceAccountName: secrets-reader
       containers:
       - name: todoapp
         image: ikulyk404/todoapp:4.0.1
@@ -82,6 +81,7 @@ spec:
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 5
+      serviceAccountName: secrets-reader
       volumes:
       - name: data
         persistentVolumeClaim:
