@@ -12,7 +12,7 @@
    kind create cluster --config cluster.yml
 2. **Apply RBAC manifest:**
    ```bash    
-    kubectl apply -f security/rbac.yml
+    kubectl apply -f security/rbac
 3. **Apply deployment:**
    ```bash
    kubectl apply -f deployment/
