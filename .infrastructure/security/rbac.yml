@@ -2,19 +2,19 @@ kind: ServiceAccount
 apiVersion: v1
 metadata:
  name: secrets-reader
- namespace: mateapp
+ namespace: todoapp
 
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
- namespace: mateapp # This is the namespace where the role will be created
+ namespace: todoapp # This is the namespace where the role will be created
  name: secret-reader # This is the name of the role
 rules:
 - apiGroups: [""] # "" indicates the core API group, which includes all core APIs
  resources: ["secrets"] # Indicates the resources that the role can access, in this case, pods
- verbs: ["list", "get", "wath"] # Indicates the actions that the role can perform on the resources
+ verbs: ["list", "get", "watch"] # Indicates the actions that the role can perform on the resources
 
 ---
 
@@ -22,8 +22,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
  name: secret-reader # This is the name of the role binding
- namespace: mateapp # This is the namespace where the role binding will be created
+ namespace: todoapp # This is the namespace where the role binding will be created
 subjects:
 - kind: ServiceAccount # Indicates that the subject is a service account
  name: secrets-reader # This is the name of the service account
 roleRef:
+  kind: Role # Indicates the kind of the role that the role binding will reference
+  name: secret-reader # This is the name of the role
+  apiGroup: rbac.authorization.k8s.io
