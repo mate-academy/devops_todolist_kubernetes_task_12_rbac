@@ -13,7 +13,7 @@ metadata:
  name: secret-reader # This is the name of the role
 rules:
 - apiGroups: [""] # "" indicates the core API group, which includes all core APIs
- resources: ["secrets"] # Indicates the resources that the role can access, in this case, pods it`s secrets
+ resources: ["secrets"] # Indicates the resources that the role can access, in this case, it`s secrets
  verbs: ["list", "get", "watch"] # Indicates the actions that the role can perform on the resources
 
 ---
