@@ -8,7 +8,7 @@
 
 7 kubectl apply -f .infrastructure/security/rbac.yml
 8 kubectl get pods -n todoapp
-9 kubectl exec <pod-name> -it -n mateapp -- sh
+9 kubectl exec <pod-name> -it -n todoapp -- sh
 10 export APISERVER=https://kubernetes.default.svc
    export TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
    export CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -17,5 +17,4 @@
   $APISERVER/api/v1/namespaces/todoapp/secrets
 
 Expected results:
-mysql pods only on app=mysql nodes, each on separate nodes
-todoapp pods preferring app=todoapp nodes and not co-locating
+curl must request RBAC/secrets listing

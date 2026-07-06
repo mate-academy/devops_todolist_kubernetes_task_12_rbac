@@ -24,6 +24,7 @@ metadata:
 subjects:
 - kind: ServiceAccount # Indicates that the subject is a service account
   name: secrets-reader # This is the name of the service account
+  namespace: todoapp
 roleRef:
   kind: Role
   name: secrets-reader
