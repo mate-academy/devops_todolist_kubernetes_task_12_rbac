@@ -17,10 +17,12 @@ spec:
       labels:
         app: todoapp
     spec:
-      serviceAccountName: secrets-reader
+      serviceAccountName: pods-lister
       containers:
       - name: todoapp
         image: ikulyk404/todoapp:4.0.1
+        command: ["sh", "-c"]
+        args: ["sleep 3600"]
         volumeMounts:
         - name: data
           mountPath: /app/data
