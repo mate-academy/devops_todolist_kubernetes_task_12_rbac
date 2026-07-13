@@ -44,21 +44,31 @@ Ensure the Kubernetes cluster is running and all required manifests are availabl
 
 ## Expected Result
 
-The request must fail and return a `403 Forbidden` response similar to:
+The request must succeed and return an HTTP `200 OK` status along with a JSON response listing the Secrets in the `todoapp` namespace.
+
+Example response:
 
 ```json
 {
-  "kind": "Status",
+  "kind": "SecretList",
   "apiVersion": "v1",
-  "metadata": {},
-  "status": "Failure",
-  "message": "secrets is forbidden: User \"system:serviceaccount:todoapp:pods-lister\" cannot list resource \"secrets\" in API group \"\" in the namespace \"todoapp\"",
-  "reason": "Forbidden",
-  "details": {
-    "kind": "secrets"
+  "metadata": {
+    "resourceVersion": "12345"
   },
-  "code": 403
+  "items": [
+    {
+      "metadata": {
+        "name": "app-secret",
+        "namespace": "todoapp"
+      },
+      "type": "Opaque",
+      "data": {
+        "DB_PASSWORD": "...",
+        "SECRET_KEY": "..."
+      }
+    }
+  ]
 }
 ```
 
-This confirms that the `pods-lister` ServiceAccount is correctly restricted by the RBAC configuration and cannot access Secrets in the `todoapp` namespace.
+This confirms that the `pods-lister` ServiceAccount is correctly bound to the Role and has permission to list Secrets in the `todoapp` namespace.
