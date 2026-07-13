@@ -9,24 +9,25 @@ metadata:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: admin
   namespace: todoapp
+  name: secrets-lister
 rules:
-  apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["list", "get"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["list", "get"]
 
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: pods-lister-binding
   namespace: todoapp
+  name: secrets-lister-binding
 subjects:
   - kind: ServiceAccount
     name: pods-lister
+    namespace: todoapp
 roleRef:
   kind: Role
-  name: pods-lister
+  name: secrets-lister
   apiGroup: rbac.authorization.k8s.io
