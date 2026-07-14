@@ -1,0 +1,179 @@
+# Validation Instructions — RBAC for `secrets-reader`
+
+This change adds a `ServiceAccount`, `Role`, and `RoleBinding`
+(`security/rbac.yml`) that grant permission to **list** `Secret` objects in
+the `todoapp` namespace, and wires the `todoapp` `Deployment`
+(`.infrastructure/app/deployment.yml`) to run as that `ServiceAccount` via
+`spec.template.spec.serviceAccountName: secrets-reader`.
+
+## 0. Create the cluster
+
+A `kind` cluster config is provided at `cluster.yml` (1 control-plane + 4
+worker nodes, with port mappings for the app's NodePort service).
+
+```bash
+kind create cluster --config cluster.yml
+kubectl cluster-info
+kubectl get nodes
+```
+
+> If you're using Docker Desktop's built-in Kubernetes instead of `kind`,
+> just make sure Kubernetes is enabled (Docker Desktop → Settings →
+> Kubernetes → Enable Kubernetes) and skip this step.
+
+## 1. Apply the manifests
+
+Apply MySQL first (the app depends on it), then the app manifests, then
+RBAC. Order matters because `todoapp` and `mysql` are in separate
+namespaces created by their own manifests.
+
+```bash
+# MySQL (its own namespace, StatefulSet, Secret, ConfigMap, Service)
+kubectl apply -f .infrastructure/mysql/
+
+# App namespace + storage + config + secret first
+kubectl apply -f .infrastructure/app/ns.yml
+kubectl apply -f .infrastructure/app/pv.yml
+kubectl apply -f .infrastructure/app/pvc.yml
+kubectl apply -f .infrastructure/app/secret.yml
+kubectl apply -f .infrastructure/app/configMap.yml
+
+# RBAC (ServiceAccount, Role, RoleBinding) — must exist before the Deployment
+kubectl apply -f security/rbac.yml
+
+# App workload + networking
+kubectl apply -f .infrastructure/app/deployment.yml
+kubectl apply -f .infrastructure/app/clusterIp.yml
+kubectl apply -f .infrastructure/app/nodeport.yml
+kubectl apply -f .infrastructure/app/hpa.yml
+```
+
+> If `kubectl apply -f .infrastructure/mysql/` or `.infrastructure/app/`
+> (applied as a whole folder) reports `namespaces "mysql"` or
+> `"todoapp" not found`, it means files were applied out of order in one
+> pass. Simply re-run `kubectl apply -f <folder>/` a second time — it's
+> idempotent and will pick up whatever failed on the first pass once the
+> namespace exists.
+
+## 2. Confirm everything is running
+
+```bash
+kubectl get pods -n mysql
+kubectl get pods -n todoapp
+```
+
+Both `mysql-0`/`mysql-1` and the `todoapp-*` pods should reach
+`1/1 Running`. A restart or two while MySQL finishes starting up is normal;
+watch with `kubectl get pods -n todoapp -w` if they're still cycling.
+
+## 3. Confirm the RBAC objects exist
+
+```bash
+kubectl get serviceaccount secrets-reader -n todoapp
+kubectl get role secrets-reader-role -n todoapp
+kubectl get rolebinding secrets-reader-binding -n todoapp
+```
+
+Inspect the Role to confirm it only allows `list` on `secrets`:
+
+```bash
+kubectl get role secrets-reader-role -n todoapp -o yaml
+```
+
+Expected `rules`:
+
+```yaml
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["list"]
+```
+
+## 4. Confirm the Deployment uses the ServiceAccount
+
+```bash
+kubectl get deployment todoapp -n todoapp \
+  -o jsonpath='{.spec.template.spec.serviceAccountName}'
+```
+
+Expected output: `secrets-reader`
+
+## 5. Verify permissions with `kubectl auth can-i`
+
+```bash
+kubectl auth can-i list secrets \
+  --as=system:serviceaccount:todoapp:secrets-reader \
+  -n todoapp
+# expected: yes
+```
+
+Negative checks (the ServiceAccount should NOT be able to do more than
+this):
+
+```bash
+kubectl auth can-i get secrets \
+  --as=system:serviceaccount:todoapp:secrets-reader \
+  -n todoapp
+# expected: no
+
+kubectl auth can-i list secrets \
+  --as=system:serviceaccount:todoapp:secrets-reader \
+  -n default
+# expected: no
+```
+
+## 6. Exec into the pod and curl the Kubernetes API to list secrets
+
+Get the running pod name:
+
+```bash
+POD=$(kubectl get pod -n todoapp -l app=todoapp -o jsonpath='{.items[0].metadata.name}')
+echo $POD
+```
+
+Open an interactive shell in the pod:
+
+```bash
+kubectl exec -n todoapp -it "$POD" -- sh
+```
+
+Inside the pod's shell, run:
+
+```sh
+TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+curl -s --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+  -H "Authorization: Bearer $TOKEN" \
+  https://kubernetes.default.svc/api/v1/namespaces/todoapp/secrets
+```
+
+Expected result: a JSON response with `"kind": "SecretList"` whose `items`
+array contains the `app-secret` object. This confirms the request succeeded
+(not a `403 Forbidden`) using only the permissions granted by
+`security/rbac.yml`.
+
+Exit the pod shell when done:
+
+```sh
+exit
+```
+
+> **Windows/PowerShell note:** passing a multi-line or `$`-containing
+> command straight into `kubectl exec ... -- sh -c '...'` from PowerShell
+> is unreliable because PowerShell's quoting/escaping rules differ from
+> POSIX shells. The interactive-shell approach above (`kubectl exec -it
+> $POD -- sh`, then typing the two commands inside the pod) avoids that
+> problem entirely and is the recommended way to reproduce this on Windows.
+
+**This is the output to screenshot** — the terminal showing both commands
+and the resulting `SecretList` JSON — and attach to the pull request as
+evidence that the `secrets-reader` ServiceAccount can list secrets from
+within the `todoapp` Deployment's own pod.
+
+## 7. Clean-up (optional)
+
+```bash
+kubectl delete -f .infrastructure/app/
+kubectl delete -f security/rbac.yml
+kubectl delete -f .infrastructure/mysql/
+kind delete cluster --name kind
+```
