@@ -1,0 +1,119 @@
+# Validation Instructions — RBAC for `secrets-reader`
+
+This change adds a `ServiceAccount`, `Role`, and `RoleBinding` (see
+`security/rbac.yaml`) that grant permission to **list** `Secret` objects in
+the `todoapp` namespace, and wires the `todoapp` `Deployment`
+(`deployment/deployment.yaml`) to run as that `ServiceAccount`.
+
+## 1. Apply the manifests
+
+Apply in this order so the namespace and RBAC objects exist before the
+Deployment references them:
+
+```bash
+kubectl apply -f namespace/namespace.yaml
+kubectl apply -f security/rbac.yaml
+kubectl apply -f deployment/deployment.yaml
+```
+
+## 2. Confirm the RBAC objects exist
+
+```bash
+kubectl get serviceaccount secrets-reader -n todoapp
+kubectl get role secrets-reader-role -n todoapp
+kubectl get rolebinding secrets-reader-binding -n todoapp
+```
+
+Inspect the Role to confirm it only allows `list` on `secrets`:
+
+```bash
+kubectl get role secrets-reader-role -n todoapp -o yaml
+```
+
+You should see:
+
+```yaml
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["list"]
+```
+
+## 3. Confirm the Deployment uses the ServiceAccount
+
+```bash
+kubectl get deployment todoapp -n todoapp \
+  -o jsonpath='{.spec.template.spec.serviceAccountName}'
+```
+
+Expected output: `secrets-reader`
+
+## 4. Verify permissions with `kubectl auth can-i`
+
+```bash
+kubectl auth can-i list secrets \
+  --as=system:serviceaccount:todoapp:secrets-reader \
+  -n todoapp
+```
+
+Expected output: `yes`
+
+As a negative check, confirm the ServiceAccount can NOT do anything broader
+(e.g. `get`/`delete` a single secret, or list secrets in another namespace):
+
+```bash
+kubectl auth can-i get secrets \
+  --as=system:serviceaccount:todoapp:secrets-reader \
+  -n todoapp
+# expected: no
+
+kubectl auth can-i list secrets \
+  --as=system:serviceaccount:todoapp:secrets-reader \
+  -n default
+# expected: no
+```
+
+## 5. Exec into the pod and curl the Kubernetes API to list secrets
+
+Get the running pod name:
+
+```bash
+POD=$(kubectl get pod -n todoapp -l app=todoapp -o jsonpath='{.items[0].metadata.name}')
+echo $POD
+```
+
+Exec into the pod and use its mounted ServiceAccount token to call the API
+server directly:
+
+```bash
+kubectl exec -n todoapp -it "$POD" -- sh -c '
+  TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+  CACERT=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+  curl -s \
+    --cacert "$CACERT" \
+    -H "Authorization: Bearer $TOKEN" \
+    https://kubernetes.default.svc/api/v1/namespaces/todoapp/secrets
+'
+```
+
+Expected result: an HTTP 200 JSON response with `"kind": "SecretList"`
+containing the `app-secret` object (metadata only is fine — the important
+part is that the API call succeeds with a `200` status and is not rejected
+with a `403 Forbidden`).
+
+Take a screenshot of this terminal output (showing the successful
+`SecretList` response) and attach it to the pull request as evidence that
+the `secrets-reader` ServiceAccount can list secrets from within the
+`todoapp` Deployment's pod.
+
+## 6. Clean-up check (optional)
+
+```bash
+kubectl delete -f deployment/deployment.yaml
+kubectl delete -f security/rbac.yaml
+kubectl delete -f namespace/namespace.yaml
+```
+
+Confirm all objects (`ServiceAccount`, `Role`, `RoleBinding`, `Deployment`,
+`Service`, `PVC`, `PV`, `Secret`, `ConfigMap`, `HPA`, `Namespace`) are
+removed with no errors.
