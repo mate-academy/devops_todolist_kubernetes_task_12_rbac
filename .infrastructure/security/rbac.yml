@@ -13,7 +13,7 @@ metadata:
   namespace: todoapp
 rules:
 - apiGroups: [""]
-  resources: ["pods"]
+  resources: ["secrets"]
   verbs: ["list", "get"]
 
 ---
@@ -26,6 +26,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: secrets-reader
+  namespace: todoapp
 roleRef:
   kind: Role
   name: secrets-reader
