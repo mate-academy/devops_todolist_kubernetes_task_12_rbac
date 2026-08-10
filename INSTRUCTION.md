@@ -8,7 +8,7 @@
 
 ## 1. Create the kind cluster
 
-From the repository root:
+From the repository root (the **`cluster.yml`** file is in the repo root):
 
 ```bash
 kind create cluster --config cluster.yml
@@ -16,21 +16,23 @@ kubectl config use-context kind-kind
 kubectl get nodes
 ```
 
-Expect **5 nodes** (1 control-plane + 4 workers).
+Expect **5 nodes** (1 control-plane + 4 workers), as defined in `cluster.yml`.
 
 ## 2. Deploy infrastructure
+
+`bootstrap.sh` applies resources in order: MySQL, namespace **`todoapp`**, RBAC (`.infrastructure/security/rbac.yml`), then the app manifests including Deployment.
 
 ```bash
 chmod +x bootstrap.sh
 ./bootstrap.sh
 ```
 
-Or on Windows (PowerShell), apply the same files manually:
+Or on Windows (PowerShell), apply the same files manually (**namespace `todoapp` before RBAC and Deployment**):
 
 ```powershell
 kubectl apply -f .infrastructure/mysql/
 kubectl apply -f .infrastructure/app/ns.yml
-kubectl apply -f security/rbac.yml
+kubectl apply -f .infrastructure/security/rbac.yml
 kubectl apply -f .infrastructure/app/pv.yml
 kubectl apply -f .infrastructure/app/pvc.yml
 kubectl apply -f .infrastructure/app/secret.yml
@@ -52,6 +54,8 @@ kubectl get pods -n todoapp
 Pod should be **`1/1 Running`** and **`Ready`**.
 
 ## 3. Verify RBAC manifest
+
+RBAC file: **`.infrastructure/security/rbac.yml`**
 
 ```bash
 kubectl get serviceaccount pods-lister -n todoapp
