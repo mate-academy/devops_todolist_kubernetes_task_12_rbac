@@ -13,11 +13,19 @@ Try it out by installing the requirements (the following commands work only with
 pip install -r requirements.txt
 ```
 
-Create a database schema:
+Create a database schema (forward cluster MySQL to **localhost:3307** — port 3306 is often used by a local MySQL install):
+
+```
+kubectl port-forward -n mysql svc/mysql 3307:3306
+```
+
+In another terminal, from the repository root:
 
 ```
 python manage.py migrate
 ```
+
+(`manage.py` lives in the repo root and in `src/`.)
 
 And then start the server (default is http://localhost:8000):
 

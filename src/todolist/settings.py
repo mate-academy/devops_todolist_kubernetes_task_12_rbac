@@ -18,7 +18,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY", "")
+# In Kubernetes, SECRET_KEY is injected from app-secret; locally use env or dev default.
+SECRET_KEY = os.environ.get("SECRET_KEY") or "dev-local-secret-key-not-for-production"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -61,10 +62,12 @@ WSGI_APPLICATION = "todolist.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
-DB_NAME = os.environ.get("DB_NAME", "")
-DB_USER = os.environ.get("DB_USER", "")
-DB_PASSWORD = os.environ.get("DB_PASSWORD", "")
-DB_HOST = os.environ.get("DB_HOST", "")
+# Match .infrastructure/mysql and app secrets; override via env (required in cluster pods).
+DB_NAME = os.environ.get("DB_NAME") or "app_db"
+DB_USER = os.environ.get("DB_USER") or "app_user"
+DB_PASSWORD = os.environ.get("DB_PASSWORD") or "1234"
+DB_HOST = os.environ.get("DB_HOST") or "127.0.0.1"
+DB_PORT = os.environ.get("DB_PORT") or "3307"
 
 DATABASES = {
     'default': {
@@ -72,8 +75,8 @@ DATABASES = {
         'NAME': DB_NAME,
         'USER': DB_USER,
         'PASSWORD': DB_PASSWORD,
-        'HOST': DB_HOST,  # You can use a different host if your MySQL server is on a remote machine.
-        'PORT': '',  # Leave this empty to use the default MySQL port (3306).
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
 }
 
