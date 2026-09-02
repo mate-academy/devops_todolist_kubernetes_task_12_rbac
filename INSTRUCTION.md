@@ -9,7 +9,7 @@ kind create cluster --config cluster.yml
 ## 2. Deploy application
 
 ```bash
-./deploy.sh
+./bootstrap.sh
 ```
 
 ## 3. Check RBAC
