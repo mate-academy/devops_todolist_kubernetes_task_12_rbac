@@ -35,13 +35,3 @@
      -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
      https://kubernetes.default.svc/api/v1/namespaces/todoapp/secrets
    ```
-
-6. **Take a screenshot** of the output showing the secrets list response and attach it to your PR.
-
-> **Note:** The Deployment (`.infrastructure/app/deployment.yml`) already uses `serviceAccountName: secrets-reader`. No changes needed there.
-
-### Screenshot
-
-Paste your screenshot here:
-
-![RBAC secrets list](./screenshots/rbac-secrets-list.png)
