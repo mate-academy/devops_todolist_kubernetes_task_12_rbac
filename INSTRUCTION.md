@@ -28,13 +28,20 @@
    kubectl get rolebinding secret-reader-binding -n todoapp
    ```
 
-5. **List secrets from a pod using the ServiceAccount:**
+5. **List secrets from the Deployment pod using the ServiceAccount:**
    ```bash
-   kubectl exec -n todoapp deploy/todoapp -- curl -s http://localhost:8080/api/
-   ```
-   Or directly into the pod shell:
-   ```bash
-   kubectl exec -n todoapp deploy/todoapp -- /bin/sh -c "curl -s --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt -H \"Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)\" https://kubernetes.default.svc/api/v1/namespaces/todoapp/secrets"
+   kubectl exec -n todoapp deploy/todoapp -- curl -s \
+     --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+     -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+     https://kubernetes.default.svc/api/v1/namespaces/todoapp/secrets
    ```
 
 6. **Take a screenshot** of the output showing the secrets list response and attach it to your PR.
+
+> **Note:** The Deployment (`.infrastructure/app/deployment.yml`) already uses `serviceAccountName: secrets-reader`. No changes needed there.
+
+### Screenshot
+
+Paste your screenshot here:
+
+![RBAC secrets list](./screenshots/rbac-secrets-list.png)
