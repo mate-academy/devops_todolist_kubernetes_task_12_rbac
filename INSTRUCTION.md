@@ -1,5 +1,5 @@
 # RBAC validation
-Create kind rluster:
+Create kind cluster:
 
 ```bash
 kind create cluster --config cluster.yml
