@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: todoapp-sa
+  namespace: todoapp
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: secret-list
+  namespace: todoapp
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["list"]
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: todoapp-secret-list-binding
+  namespace: todoapp
+subjects:
+  - kind: ServiceAccount
+    name: todoapp-sa
+    namespace: todoapp
+roleRef:
+  kind: Role
+  name: secret-list
+  apiGroup: rbac.authorization.k8s.io

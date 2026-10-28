@@ -13,6 +13,7 @@ spec:
     matchLabels:
       app: todoapp
   template:
+    serviceAccountName: todoapp-sa
     metadata:
       labels:
         app: todoapp
