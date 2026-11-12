@@ -19,7 +19,11 @@ The namespace must exist before the RBAC objects, and the ServiceAccount must ex
 
 ```bash
 # bootstrap.sh does not apply security/rbac.yml, so apply it manually
-kubectl apply -f .infrastructure/mysql/
+kubectl apply -f .infrastructure/mysql/ns.yml
+kubectl apply -f .infrastructure/mysql/configMap.yml
+kubectl apply -f .infrastructure/mysql/secret.yml
+kubectl apply -f .infrastructure/mysql/service.yml
+kubectl apply -f .infrastructure/mysql/statefulSet.yml
 kubectl apply -f .infrastructure/app/ns.yml
 kubectl apply -f security/rbac.yml
 kubectl apply -f .infrastructure/app/pv.yml
@@ -32,12 +36,17 @@ kubectl apply -f .infrastructure/app/hpa.yml
 kubectl apply -f .infrastructure/app/deployment.yml
 ```
 
+Do not apply `.infrastructure/mysql/` as a directory: files are applied alphabetically, so `configMap.yml` would run before `ns.yml` and fail because the `mysql` namespace does not exist yet.
+
+The first start can take a few minutes (MySQL image pull and initialization). The app pods may restart once or twice until MySQL is ready, this is expected.
+
 Check that everything is created and the pod uses the ServiceAccount:
 
 ```bash
 kubectl get sa,role,rolebinding -n todoapp
-kubectl wait --for=condition=available deployment/todoapp -n todoapp --timeout=180s
-kubectl get pod -n todoapp -l app=todoapp -o jsonpath='{.items[0].spec.serviceAccountName}'
+kubectl get pods -n mysql
+kubectl wait --for=condition=available deployment/todoapp -n todoapp --timeout=300s
+kubectl get deploy todoapp -n todoapp -o jsonpath='{.spec.template.spec.serviceAccountName}'
 ```
 
 Expected output of the last command: `secrets-reader`.
@@ -63,29 +72,25 @@ SA=/var/run/secrets/kubernetes.io/serviceaccount
 TOKEN=$(cat $SA/token)
 NS=$(cat $SA/namespace)
 
-curl --cacert $SA/ca.crt \
+curl -i --cacert $SA/ca.crt \
   -H "Authorization: Bearer $TOKEN" \
-  https://kubernetes.default.svc/api/v1/namespaces/$NS/secrets
+  https://kubernetes.default.svc/api/v1/namespaces/$NS/secrets | head -c 700
 ```
 
-If `curl` is not installed in the image, install it first (Debian-based image, run as root):
+`curl` is already present in the image (`/usr/bin/curl`). `head -c 700` truncates the output so that secret values are not fully printed.
 
-```bash
-apt-get update && apt-get install -y curl
-```
-
-Expected result: HTTP 200 and a `SecretList` JSON that contains the secrets of the `todoapp` namespace (for example `app-secret`).
+Expected result: `HTTP/2 200` and a `SecretList` JSON that contains the secrets of the `todoapp` namespace (for example `app-secret`). A screenshot of this output is attached to the PR.
 
 ## 5. Negative check (optional)
 
 Other resources must be forbidden, for example pods:
 
 ```bash
-curl --cacert $SA/ca.crt -H "Authorization: Bearer $TOKEN" \
+curl -i --cacert $SA/ca.crt -H "Authorization: Bearer $TOKEN" \
   https://kubernetes.default.svc/api/v1/namespaces/$NS/pods
 ```
 
-Expected result: `403 Forbidden`.
+Expected result: `HTTP/2 403` (Forbidden).
 
 ## Troubleshooting
 
