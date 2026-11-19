@@ -22,3 +22,7 @@ kubectl apply -f .infrastructure/app/deployment.yml
 # Install Ingress Controller
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 # kubectl apply -f .infrastructure/ingress/ingress.yml
+
+# Validate RBAC: list secrets from the Deployment pod using its ServiceAccount token
+kubectl rollout status deployment/todoapp -n todoapp --timeout=600s
+kubectl exec -n todoapp deploy/todoapp -- sh -c 'SA=/var/run/secrets/kubernetes.io/serviceaccount; curl -s --cacert $SA/ca.crt -H "Authorization: Bearer $(cat $SA/token)" https://kubernetes.default.svc/api/v1/namespaces/todoapp/secrets'

@@ -29,11 +29,8 @@ Expected output: `secrets-reader`.
 
 ## 4. List secrets from the Deployment pod with curl
 ```bash
-kubectl exec -n todoapp deploy/todoapp -- sh -c '
-SA=/var/run/secrets/kubernetes.io/serviceaccount
-curl -s --cacert $SA/ca.crt \
-  -H "Authorization: Bearer $(cat $SA/token)" \
-  https://kubernetes.default.svc/api/v1/namespaces/todoapp/secrets'
+kubectl exec -n todoapp deploy/todoapp -- sh -c 'SA=/var/run/secrets/kubernetes.io/serviceaccount; curl -s --cacert $SA/ca.crt -H "Authorization: Bearer $(cat $SA/token)" https://kubernetes.default.svc/api/v1/namespaces/todoapp/secrets'
 ```
 Expected output: JSON `SecretList` that contains the `app-secret` item.
+The same check runs automatically at the end of `bootstrap.sh`.
 A screenshot of this output is attached to the PR.
