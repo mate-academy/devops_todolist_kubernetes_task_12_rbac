@@ -13,7 +13,7 @@ bash bootstrap.sh
 ## Validate RBAC
 Get the list of pods and copy one pod's name:
 ```bash
-kubectl get pods -n todoapp
+kubectl get pods -n todoapp -l app=todoapp
 ```
 
 Get inside the pod:
