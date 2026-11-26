@@ -20,7 +20,7 @@ kubectl describe rolebindings -n <namespace-name> <rolebinding-name>
 # To get clusterroles and clusterrolebindings you can use:
 
 kubectl get clusterrole -A
-kubectl describe roles <clusterrole-name>
+kubectl describe clusterrole <clusterrole-name>
 kubectl get clusterrolebindings
 kubectl describe clusterrolebindings <clusterrolebinding-name>
 
